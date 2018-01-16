@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Tue Jan  9 14:07:53 2018
 
@@ -7,7 +6,6 @@ Created on Tue Jan  9 14:07:53 2018
 
 from PIL import Image, ImageDraw
 import os
-from pprint import pprint
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,42 +13,38 @@ import matplotlib.image as mpimg
 
 
 def displayImage(imPath, imName):
-    imPath = os.path.join(imPath, "03\\", imName)
+    imPath = os.path.join(imPath, "03", imName)
     im = Image.open(imPath)
     print(("Format:" + im.format + ", size:" + str(im.size) + ", mode:" + im.mode))
     im.show()
     
 def displayImageMPLT(imPath, imName):
-    imPath = os.path.join(imPath, "03\\", imName)
+    imPath = os.path.join(imPath, "03", imName)
     img = mpimg.imread(imPath)
-    imgplot = plt.imshow(img)
+    plt.imshow(img)
     
 def drawPointOnImage(imPath, imName, pX, pY):
     displayImageMPLT(imPath, imName)
-    plt.scatter(pX, pY)    
-    
-    
-def getPhotoParameters(imPath, imName):
-    '''Return the photo parameters (X,Y,Z,omega, phi, kappa) given its name
-    '''
-    
-    # open the camera parameters file
-    cameraParamFile = "03_calibrated_external_camera_parameters_UTM31.txt"
+    plt.scatter(pX, pY)
+
+
+def getPhotoParameters(imPath, imName, cameraParamFile):
+    """Return the photo parameters (X,Y,Z,omega, phi, kappa) given its name
+    """
+
     cameraParamPath = os.path.join(imPath, cameraParamFile)
-    
-    file = open(cameraParamPath, 'r') 
+
+    file = open(cameraParamPath, 'r')
     lines = file.readlines()
     file.close()
 
     for line in lines:
         imagesParameters = line.split(" ")
-#        print(imagesParameters[0])
         if imagesParameters[0] == imName:
-#            print(imagesParameters)
             break
-        
+
     imagesParameters[1:] = [float(i) for i in imagesParameters[1:]]
-    
+
     return imagesParameters
 
 def getCameraParameters(imPath):
@@ -95,12 +89,12 @@ def getDistance2Camera(pylonCoords, cameraCoords):
     return distance 
 
 
-def getPotentialPylones(imPath, imName, maxDistanceToCamera):
+def getPotentialPylones(imPath, imName, maxDistanceToCamera, cameraParamFile):
     ''' Returns the IDs and coordinates of the potential pylones on the image, given a constraint
     on their admissible distance to the camera
     '''
     
-    photoParameters = getPhotoParameters(imPath, imName)
+    photoParameters = getPhotoParameters(imPath, imName, cameraParamFile)
     cameraPos = photoParameters[1:3]
     
 #    maxDistanceToCamera = 100
@@ -119,12 +113,12 @@ def getPotentialPylones(imPath, imName, maxDistanceToCamera):
     
     return potentialPylones
 
-def getPotentialLinePoints(imPath, imName, maxDistanceToCamera):
+def getPotentialLinePoints(imPath, imName, maxDistanceToCamera, cameraParamFile):
     ''' Returns the IDs and coordinates of the potential pylones on the image, given a constraint
     on their admissible distance to the camera
     '''
     
-    photoParameters = getPhotoParameters(imPath, imName)
+    photoParameters = getPhotoParameters(imPath, imName, cameraParamFile)
     cameraPos = photoParameters[1:3]
     
     potentialPylones = []
@@ -141,9 +135,7 @@ def getPotentialLinePoints(imPath, imName, maxDistanceToCamera):
                 
     return potentialPylones
 
-                
-                
-                
+
 
 def main():
     plt.close('all')
