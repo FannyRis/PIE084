@@ -12,8 +12,6 @@ import matplotlib.image as mpimg
 import cProfile
 import os
 
-#def extractCoords():
-    
 def m2mm(measure):
     '''Convert a measure in meters into milimeters
     '''
