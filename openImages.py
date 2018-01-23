@@ -4,20 +4,13 @@ Created on Tue Jan  9 14:07:53 2018
 @author: Louis BAETENS
 """
 
-from PIL import Image, ImageDraw
 import os
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-
-def displayImage(imPath, imName):
-    imPath = os.path.join(imPath, "03", imName)
-    im = Image.open(imPath)
-    print(("Format:" + im.format + ", size:" + str(im.size) + ", mode:" + im.mode))
-    im.show()
-    
+   
 def displayImageMPLT(imPath, imName):
     imPath = os.path.join(imPath, "03", imName)
     img = mpimg.imread(imPath)

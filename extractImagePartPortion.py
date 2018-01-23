@@ -14,7 +14,7 @@ from PIL import Image
 
 
 
-def extractPortion(imPath, imName, sizeX, sizeY, centerX, centerY):
+def extractPortion(imPath, imName, additionalName, sizeX, sizeY, centerX, centerY):
     '''Extract a portion of the image of size sizeX x sizeY, with its origin
     being top and left (so top-left corner is to be given)
     Returns the image (or save it, to determine)
@@ -38,22 +38,22 @@ def extractPortion(imPath, imName, sizeX, sizeY, centerX, centerY):
         cropped_im = im.crop(crop_rectangle)
         print("Extracted")
         print(left, top, right, bottom)
-        outName = (imName[:-4]+'_{:.0f}_{:.0f}.jpg').format(centerX, centerY)
-        outPath = os.path.join('croppedImages', outName)
+        outName = (imName[:-4]+additionalName+'_{:.0f}_{:.0f}.jpg').format(centerX, centerY)
+        outPath = os.path.join('..' ,'data_base', 'backgroundDB', outName)
 
         cropped_im.save(outPath)
 
 #        cropped_im.show()
 
-def extractRandomPortion(imPath, imName, windowSizeX, windowSizeY, imageSizeX, imageSizeY):
+def extractRandomPortion(imPath, imName, additionalName, windowSizeX, windowSizeY, imageSizeX, imageSizeY):
     '''Extract a portion of the image, selected randomly
     Not so useful apart for some tests
     '''
     centerX = np.random.randint(windowSizeX/2, imageSizeX-windowSizeX/2)
     centerY = np.random.randint(windowSizeY/2, imageSizeY-windowSizeY/2)    
-    extractPortion(imPath, imName, windowSizeX, windowSizeY, centerX, centerY)
+    extractPortion(imPath, imName, additionalName, windowSizeX, windowSizeY, centerX, centerY)
     
-def extractRandomRegion(imPath, imName, windowSizeX, windowSizeY, imageSizeX, imageSizeY, centerPointX, centerPointY, maxDistance):
+def extractRandomRegion(imPath, imName, additionalName, windowSizeX, windowSizeY, imageSizeX, imageSizeY, centerPointX, centerPointY, maxDistance):
     '''Extract a region in the neibourghood of the specified center
     This is the function to use
     '''
@@ -71,7 +71,9 @@ def extractRandomRegion(imPath, imName, windowSizeX, windowSizeY, imageSizeX, im
     centerX = np.random.randint(limitLeft, limitRight)
     centerY = np.random.randint(limitTop, limitBottom)   
     
-    extractPortion(imPath, imName, windowSizeX, windowSizeY, centerX, centerY)
+#    outName = 'p_'+imName+    
+    
+    extractPortion(imPath, imName, additionalName, windowSizeX, windowSizeY, centerX, centerY)
     
     return [centerX, centerY]
     
