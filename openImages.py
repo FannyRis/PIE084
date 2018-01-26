@@ -117,7 +117,7 @@ def getPotentialLinePoints(imPath, imName, maxDistanceToCamera, cameraParamFile)
     potentialPylones = []
 
     
-    with open('all_linesGPS.csv', 'r') as csvfile:
+    with open('all_linesGPS_center.csv', 'r') as csvfile:
         pylonsList = csv.reader(csvfile)
         pylonsList = filter(None, pylonsList)
         for pylon in pylonsList:

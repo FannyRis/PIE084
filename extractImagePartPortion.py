@@ -11,7 +11,68 @@ import matplotlib.image as mpimg
 
 from PIL import Image
 
+def splitImage(imPath, imName, windowSize, step):
+    '''Split an image into small patches
+    '''
+    fullPath = os.path.join(imPath,imName)
+    im = Image.open(fullPath)
+    
+    [sizeX, sizeY] = im.size
+    # will not take the extrem right and bottom borders of the image
+    centersX = np.arange(windowSize/2, sizeX-windowSize/2, step)
+    centersY = np.arange(windowSize/2, sizeY-windowSize/2, step)
 
+#    currentPath = os.path.dirname(os.path.abspath(__file__))
+#    directory = os.path.join(currentPath, '..', 'splited', imName[:-4])
+#    if not os.path.exists(directory):
+#        os.makedirs(directory)
+    
+    croppedImages = []    
+    
+    for cX in centersX:
+        for cY in centersY:
+            left = cX-windowSize/2
+            right = cX+windowSize/2
+            top = cY-windowSize/2
+            bottom = cY+windowSize/2
+            
+            crop_rectangle = (left, top, right, bottom)
+            cropped_im = im.crop(crop_rectangle)
+#            print("Extracted")
+#            print(left, top, right, bottom)
+#            outName = (imName[:-4]+'_{:.0f}_{:.0f}.jpg').format(cX, cY)
+#            outPath = os.path.join(directory, outName)
+#            cropped_im.save(outPath)
+            croppedImages.append(cropped_im)
+    print('Spliting finished')
+    images2array = [np.array(x) for x in croppedImages]
+    
+    ci = np.array(images2array)
+    shape = (len(ci), windowSize, windowSize, 3)
+    ci.reshape(shape)
+    return ci
+    
+    
+    #set the corners
+    left = centerX-sizeX/2
+    right = centerX+sizeX/2
+    top = centerY-sizeY/2
+    bottom = centerY+sizeY/2
+    
+    crop_rectangle = (left, top, right, bottom)
+    
+    if left<0 or right>im.size[0] or top<0 or bottom>im.size[1]:
+        print("Impossible, bad dimension")
+        print(left, top, right, bottom)
+        
+    else:
+        cropped_im = im.crop(crop_rectangle)
+        print("Extracted")
+        print(left, top, right, bottom)
+        outName = (imName[:-4]+additionalName+'_{:.0f}_{:.0f}.jpg').format(centerX, centerY)
+        outPath = os.path.join('..' ,'data_base', 'linesDB', outName)
+
+        cropped_im.save(outPath)
 
 
 def extractPortion(imPath, imName, additionalName, sizeX, sizeY, centerX, centerY):
@@ -39,7 +100,7 @@ def extractPortion(imPath, imName, additionalName, sizeX, sizeY, centerX, center
         print("Extracted")
         print(left, top, right, bottom)
         outName = (imName[:-4]+additionalName+'_{:.0f}_{:.0f}.jpg').format(centerX, centerY)
-        outPath = os.path.join('..' ,'data_base', 'backgroundDB', outName)
+        outPath = os.path.join('..' ,'data_base', 'linesDB', outName)
 
         cropped_im.save(outPath)
 
@@ -82,9 +143,20 @@ def extractRandomRegion(imPath, imName, additionalName, windowSizeX, windowSizeY
 
 def main():
     currentPath = os.path.dirname(os.path.abspath(__file__))
-    imPath = os.path.join(currentPath, 'gourd_c1818', 'Images', '03')
+    imPath = os.path.join(currentPath, '..', 'data', 'gourd_c1818', 'Images', '03')
     imName = '03_00000184.jpg'
     
+    ci = splitImage(imPath, imName, 100, 25)
+
+    print(ci.shape)
+    
+    return
+    ta = np.array(ci[0])
+    ta = [np.array(x) for x in ci[0:5]]
+    
+    print(ta[1].shape)
+    print(ta[1])
+    return
 #    sizeX = 500
 #    sizeY = 500
 #    centerX = 1000

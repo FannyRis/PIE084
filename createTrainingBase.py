@@ -75,6 +75,75 @@ def createPylonsBase(numberOfTests, maxDistance):
 
             plt.plot(pylonsCoordsX, pylonsCoordsY, 'or')  
 
+
+def createLinesBase(numberOfImages, numberOfExtractions, maxDistance):
+    '''numberOfImages : nb of image to extract from, numberOfExtractions : 
+    nb of extractions per image, maxDistance : 30
+    '''
+    
+    from projectionUMT2pixel import linesProjection
+    
+    
+    plt.close('all')
+    currentPath = os.path.dirname(os.path.abspath(__file__))
+    imPath = os.path.join(currentPath, '..', 'data', 'gourd_c1818', 'Images')
+    
+    print(imPath)
+    
+    imagesNames = os.listdir(os.path.join(imPath, '03'))[1:-2]
+    
+    imagesNumber = np.arange(0, numberOfImages, 1)
+    
+    
+    wannaPlot = False
+    
+    windowSizeX = 100
+    windowSizeY = 100
+    imageSizeX = 2448
+    imageSizeY = 2048
+#    maxDistance = 30
+    
+    
+    for imNum in imagesNumber:
+#        plt.figure()
+        imName = imagesNames[imNum]
+        print(imName)
+        tempLinesCoords = linesProjection(imPath, imName)
+               
+        
+        tempLinesCoordsX = [x[0] for x in tempLinesCoords if x[0]>-1]
+        tempLinesCoordsY = [x[1] for x in tempLinesCoords if x[0]>-1]
+        
+        if len(tempLinesCoordsX) < 1:
+            continue
+        
+        
+        linNumber = np.random.randint(0, len(tempLinesCoordsX), size=numberOfExtractions)     
+
+        linCoordsX = []
+        linCoordsY = []
+        for lin in linNumber:
+            linCoordsX.append(tempLinesCoordsX[lin])
+            linCoordsY.append(tempLinesCoordsY[lin])
+        
+        
+        print(linCoordsX)
+        print(linCoordsY)        
+        
+        imPath2 = os.path.join(imPath, '03')
+        
+        offset = 0 # number to start from for the naming
+        for pylonNum in range(numberOfExtractions):
+            additionalName = '_lin' +'_{:.0f}'.format(offset+pylonNum)
+            try:
+                extractRandomRegion(imPath2, imName, additionalName, windowSizeX, windowSizeY, imageSizeX, imageSizeY, linCoordsX[pylonNum], linCoordsY[pylonNum], maxDistance)
+            except:
+                print('An error happened')  
+
+
+
+
+
 def createBackgroundBase(numberOfTests, numExtractPerImage):
    
     plt.close('all')
@@ -117,34 +186,27 @@ def createBackgroundBase(numberOfTests, numExtractPerImage):
 
             plt.plot(pylonsCoordsX, pylonsCoordsY, 'or')      
 
-def separateDatabase(dbName, separationType):
+def separateDatabase(dbName, separationType, trainingType):
     '''Separate between a training and a test database, based on various criteria
     SeparationType could be id, imName
+    trainingType is a letter, P or L for example
     '''
     from shutil import copyfile
-
 
     currentPath = os.path.dirname(os.path.abspath(__file__))
     dbPath = os.path.join(currentPath, '..', 'data_base', dbName+'DB')
     
-    subDirectories = ['Train', 'Test']
+    nameExtension = trainingType 
+    
+    subDirectories = ['train'+nameExtension, 'validation'+nameExtension]
     for subDir in subDirectories:
-        directory = os.path.join(dbPath, '..', dbName+subDir)
+        directory = os.path.join(dbPath, '..', subDir, dbName)
         if not os.path.exists(directory):
             os.makedirs(directory)
     
     # retrieves all the files names
     patchNames = os.listdir(dbPath)
-    
-    #get the individual original image names and id
     print(patchNames)
-#    originalNames = [x.split('_')[1] for x in patchNames]
-#    originalNames = sorted(set(originalNames))
-#    print(originalNames)
-#    
-#    idList = [x.split('_')[3] for x in patchNames]
-#    idList = sorted(set(idList))
-#    print(idList)
     
     trainProportion = 0.7
     
@@ -178,9 +240,9 @@ def separateDatabase(dbName, separationType):
     dst = os.path.join(dbPath, '..')    
     for fileName in patchNames:
         if fileName.split('_')[nameCut] in trainList:
-            copyfile(os.path.join(src, fileName), os.path.join(dst, dbName+'Train', fileName))
+            copyfile(os.path.join(src, fileName), os.path.join(dst, 'train'+nameExtension, dbName, fileName))
         elif fileName.split('_')[nameCut] in testList:
-            copyfile(os.path.join(src, fileName), os.path.join(dst, dbName+'Test', fileName))
+            copyfile(os.path.join(src, fileName), os.path.join(dst, 'validation'+nameExtension, dbName, fileName))
         else:
             print(fileName + " dumped")
 #            copyfile(os.path.join(src, fileName), os.path.join(dst, dbName+'Dump', fileName))
@@ -195,8 +257,9 @@ def main():
 
 #    createPylonsBase(1865, 20)
 #    createBackgroundBase(1865,3)
-    dbName = 'background'
-    separateDatabase(dbName, 'imName')
+#    createLinesBase(1865, 5, 1)
+    dbName = 'lines'
+    separateDatabase(dbName, 'imName', 'L')
 
 
 
