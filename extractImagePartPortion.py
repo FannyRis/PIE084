@@ -27,7 +27,9 @@ def splitImage(imPath, imName, windowSize, step):
 #    if not os.path.exists(directory):
 #        os.makedirs(directory)
     
-    croppedImages = []    
+    croppedImages = []  
+    rectanglesX = []
+    rectanglesY = []
     
     for cX in centersX:
         for cY in centersY:
@@ -38,11 +40,11 @@ def splitImage(imPath, imName, windowSize, step):
             
             crop_rectangle = (left, top, right, bottom)
             cropped_im = im.crop(crop_rectangle)
-#            print("Extracted")
-#            print(left, top, right, bottom)
-#            outName = (imName[:-4]+'_{:.0f}_{:.0f}.jpg').format(cX, cY)
-#            outPath = os.path.join(directory, outName)
-#            cropped_im.save(outPath)
+            
+            #from top left corner, clockwise
+            rectanglesX.append([left, right, right, left, left])
+            rectanglesY.append([top, top, bottom, bottom, top])
+
             croppedImages.append(cropped_im)
     print('Spliting finished')
     images2array = [np.array(x) for x in croppedImages]
@@ -50,29 +52,9 @@ def splitImage(imPath, imName, windowSize, step):
     ci = np.array(images2array)
     shape = (len(ci), windowSize, windowSize, 3)
     ci.reshape(shape)
-    return ci
     
+    return ci, rectanglesX, rectanglesY
     
-    #set the corners
-    left = centerX-sizeX/2
-    right = centerX+sizeX/2
-    top = centerY-sizeY/2
-    bottom = centerY+sizeY/2
-    
-    crop_rectangle = (left, top, right, bottom)
-    
-    if left<0 or right>im.size[0] or top<0 or bottom>im.size[1]:
-        print("Impossible, bad dimension")
-        print(left, top, right, bottom)
-        
-    else:
-        cropped_im = im.crop(crop_rectangle)
-        print("Extracted")
-        print(left, top, right, bottom)
-        outName = (imName[:-4]+additionalName+'_{:.0f}_{:.0f}.jpg').format(centerX, centerY)
-        outPath = os.path.join('..' ,'data_base', 'linesDB', outName)
-
-        cropped_im.save(outPath)
 
 
 def extractPortion(imPath, imName, additionalName, sizeX, sizeY, centerX, centerY):
@@ -146,10 +128,14 @@ def main():
     imPath = os.path.join(currentPath, '..', 'data', 'gourd_c1818', 'Images', '03')
     imName = '03_00000184.jpg'
     
-    ci = splitImage(imPath, imName, 100, 25)
-
-    print(ci.shape)
+    [ci, rectanglesX, rectanglesY] = splitImage(imPath, imName, 100, 25)
     
+    img = mpimg.imread(os.path.join(imPath, imName))
+    plt.imshow(img)
+    
+    for ite in [20, 500, 750]:
+        plt.plot(rectanglesX[ite], rectanglesY[ite])
+        
     return
     ta = np.array(ci[0])
     ta = [np.array(x) for x in ci[0:5]]

@@ -213,11 +213,12 @@ elif action == 'predict':
     currentPath = os.path.dirname(os.path.abspath(__file__))
     imPath = os.path.join(currentPath, '..', 'data', 'gourd_c1818', 'Images', '03')
     imName = '03_00000466.jpg'
+    imName = '03_00000654.jpg'
     
     windowSize = 100
     step = 25
     
-    patches = splitImage(imPath, imName, windowSize, step)
+    [patches, rectanglesX, rectanglesY] = splitImage(imPath, imName, windowSize, step)
     
     patches = np.divide(patches, 255)
     
@@ -230,14 +231,24 @@ elif action == 'predict':
    
     score_for_pylon = 0.7
     
+    import matplotlib.image as mpimg
+
+    img = mpimg.imread(os.path.join(imPath, imName))
+    plt.figure(1)
+    plt.imshow(img)
+    
+#    for ite in [20, 500, 750]:
+#        plt.plot(rectanglesX[ite], rectanglesY[ite])
+    
     for i in range(len(predicted)):
         if predicted[i] > score_for_pylon:
-            plt.figure()
-            plt.imshow(patches[i])
-            plt.title("Predicted: {0} // Actual score: {1}".format(
-                int(predicted[i] > score_for_pylon), predicted[i]))
-            plt.show()
-
+            plt.plot(rectanglesX[i], rectanglesY[i], 'g')
+            
+#            plt.figure()
+#            plt.imshow(patches[i])
+#            plt.title("Predicted: {0} // Actual score: {1}".format(
+#                int(predicted[i] > score_for_pylon), predicted[i]))
+    plt.show()
 
 
 
