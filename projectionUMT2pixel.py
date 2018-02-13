@@ -7,6 +7,7 @@ import matplotlib.image as mpimg
 import cProfile
 import os
 import string
+import csv
 
 # ______________________________________________________________________________________________________________________
 # ======================================================================================================================
@@ -107,7 +108,7 @@ def projUMT2pixel(PointUMTCoordinates, imageParameters):
 
 # **********************************************************************************************************************
         
-def pylonsProjection(imPath, imName):   
+def pylonsProjection(imPath, imName, write2file):   
     '''Returns the pixel coordinates of the top of all the pylons on an image
     '''
     maxDistanceToCamera = 500
@@ -120,11 +121,27 @@ def pylonsProjection(imPath, imName):
     for singlePylon in potentialPylons:
         pylonsPixelCoordinates.append([singlePylon[0],projUMT2pixel(singlePylon[1:], imageParameters)])
     
+    if write2file==True:
+        pylonsId = [int(x[0]) for x in pylonsPixelCoordinates if x[1][0]>-1]
+        pylonsCoordsX = [int(np.round(x[1][0])) for x in pylonsPixelCoordinates if x[1][0]>-1]
+        pylonsCoordsY = [int(np.round(x[1][1])) for x in pylonsPixelCoordinates if x[1][0]>-1]
+        
+        
+      
+        with open(os.path.join('..', 'objectsOnImages', (imName[:-4] + '.csv')),'a') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=',',
+                                quotechar='|', quoting=csv.QUOTE_MINIMAL)     
+        
+            for row in range(len(pylonsId)):
+                csvRow = ['pyl', pylonsId[row], pylonsCoordsX[row], pylonsCoordsY[row]]
+                spamwriter.writerow(csvRow)
+       
+    
     return pylonsPixelCoordinates
 
 # **********************************************************************************************************************
 
-def linesProjection(imPath, imName):
+def linesProjection(imPath, imName, write2file):
     '''Returns the pixel coordinates of all the lines on an image
     '''
     maxDistanceToCamera = 200
@@ -136,6 +153,20 @@ def linesProjection(imPath, imName):
     
     for singlePoint in potentialLinesPoints:
         linesPixelCoordinates.append(projUMT2pixel(singlePoint, imageParameters))
+        
+    if write2file==True:
+        linesCoordsX = [int(np.round(x[0])) for x in linesPixelCoordinates if x[0]>-1]
+        linesCoordsY = [int(np.round(x[1])) for x in linesPixelCoordinates if x[0]>-1]
+        
+        
+          
+        with open(os.path.join('..', 'objectsOnImages', (imName[:-4] + '.csv')),'a') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=',',
+                                quotechar='|', quoting=csv.QUOTE_MINIMAL)     
+        
+            for row in range(len(linesCoordsX)):
+                csvRow = ['lin', 0, linesCoordsX[row], linesCoordsY[row]]
+                spamwriter.writerow(csvRow)
     
     return linesPixelCoordinates
     
@@ -152,29 +183,32 @@ def main():
     imNumber = 1103
 
     projectedObjects = 'pylons'
-    display = True
-
+    display = False
+    
+    plt.close('all')
+    
     plt.figure()
 
-    if projectedObjects == 'lines' or 1==1:
-        imName = imagesNames[imNumber]
-        linesCoords = linesProjection(imPath, imName)
-
-        if display :
-            openImages.displayImageMPLT(imPath, imName)
-            linesCoordsX = [x[0] for x in linesCoords if x[0]>-1]
-            linesCoordsY = [x[1] for x in linesCoords if x[1]>-1]
-            plt.plot(linesCoordsX, linesCoordsY, '.')
-
-    if projectedObjects == 'pylons':
-        imName = imagesNames[imNumber]
-        pylonsCoords = pylonsProjection(imPath, imName)
-
-        if display :
-            openImages.displayImageMPLT(imPath, imName)
-            pylonsCoordsX = [x[1][0] for x in pylonsCoords if x[1][0]>-1]
-            pylonsCoordsY = [x[1][1] for x in pylonsCoords if x[1][0]>-1]
-            plt.plot(pylonsCoordsX, pylonsCoordsY, 'or')
+    for imNumber in range(len(imagesNames)):
+        if projectedObjects == 'lines' or 1==1:
+            imName = imagesNames[imNumber]
+            linesCoords = linesProjection(imPath, imName, True)
+    
+            if display :
+                openImages.displayImageMPLT(imPath, imName)
+                linesCoordsX = [x[0] for x in linesCoords if x[0]>-1]
+                linesCoordsY = [x[1] for x in linesCoords if x[1]>-1]
+                plt.plot(linesCoordsX, linesCoordsY, '.')
+    
+        if projectedObjects == 'pylons':
+            imName = imagesNames[imNumber]
+            pylonsCoords = pylonsProjection(imPath, imName, True)
+    
+            if display :
+                openImages.displayImageMPLT(imPath, imName)
+                pylonsCoordsX = [x[1][0] for x in pylonsCoords if x[1][0]>-1]
+                pylonsCoordsY = [x[1][1] for x in pylonsCoords if x[1][0]>-1]
+                plt.plot(pylonsCoordsX, pylonsCoordsY, 'or')
 
     plt.show()
 

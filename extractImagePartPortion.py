@@ -79,13 +79,17 @@ def extractPortion(imPath, imName, additionalName, sizeX, sizeY, centerX, center
         
     else:
         cropped_im = im.crop(crop_rectangle)
+        outName = (imName[:-4]+additionalName+'_{:.0f}_{:.0f}.jpg').format(centerX, centerY)
+        
+        if 'pyl' in additionalName: outFolder = 'pylonsDB'
+        if 'lin' in additionalName: outFolder = 'linesDB'
+        if 'bak' in additionalName: outFolder = 'backgroundDB'
+        
+        outPath = os.path.join('..' ,'data_base', outFolder, outName)
+#        print(('Outpath : ', outPath))
+        cropped_im.save(outPath)
         print("Extracted")
         print(left, top, right, bottom)
-        outName = (imName[:-4]+additionalName+'_{:.0f}_{:.0f}.jpg').format(centerX, centerY)
-        outPath = os.path.join('..' ,'data_base', 'linesDB', outName)
-
-        cropped_im.save(outPath)
-
 #        cropped_im.show()
 
 def extractRandomPortion(imPath, imName, additionalName, windowSizeX, windowSizeY, imageSizeX, imageSizeY):

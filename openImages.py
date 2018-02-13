@@ -107,26 +107,26 @@ def getPotentialPylones(imPath, imName, maxDistanceToCamera, cameraParamFile):
     return potentialPylones
 
 def getPotentialLinePoints(imPath, imName, maxDistanceToCamera, cameraParamFile):
-    ''' Returns the IDs and coordinates of the potential pylones on the image, given a constraint
+    ''' Returns the IDs and coordinates of the potential lines on the image, given a constraint
     on their admissible distance to the camera
     '''
     
     photoParameters = getPhotoParameters(imPath, imName, cameraParamFile)
     cameraPos = photoParameters[1:3]
     
-    potentialPylones = []
+    potentialLines = []
 
     
     with open('all_linesGPS_center.csv', 'r') as csvfile:
-        pylonsList = csv.reader(csvfile)
-        pylonsList = filter(None, pylonsList)
-        for pylon in pylonsList:
+        linesList = csv.reader(csvfile)
+        linesList = filter(None, linesList)
+        for pylon in linesList:
             pylon = [float(i) for i in pylon]
             distance = getDistance2Camera(pylon[0:2], cameraPos)
             if distance<maxDistanceToCamera:
-                potentialPylones.append(pylon)
+                potentialLines.append(pylon)
                 
-    return potentialPylones
+    return potentialLines
 
 
 
