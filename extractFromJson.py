@@ -48,17 +48,25 @@ def writePylonsCoords(fileName):
                
 def concatenateAllCSV():
     currentPath = os.path.dirname(os.path.abspath(__file__))
-    linesPath = os.path.join(currentPath, "linesGPS")
+    linesPath = os.path.join(currentPath, "../linesGPS")
     print(linesPath)
     
     linesGPSNames = os.listdir(linesPath)
+
+#    fout=open("all_linesGPS.csv","a")
+#    for lineName in linesGPSNames:
+#        for line in open(os.path.join(linesPath, lineName)):
+#             fout.write(line)   
+#             if line == None:
+#                 print(line)
     
-    fout=open("all_linesGPS.csv","a")
+    fout=open("all_linesGPS_center.csv","a")
     for lineName in linesGPSNames:
-        for line in open(os.path.join(linesPath, lineName)):
-             fout.write(line)   
-             if line == None:
-                 print(line)
+        if 'Center' in lineName:
+            for line in open(os.path.join(linesPath, lineName)):
+                 fout.write(line)   
+                 if line == None:
+                     print(line)
     fout.close()
 
 
